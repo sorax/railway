@@ -5,7 +5,7 @@ defmodule Railway do
 
   defmacro __using__(_opts) do
     quote do
-      import unquote(__MODULE__)
+      import unquote(__MODULE__), only: [~>>: 2]
     end
   end
 
