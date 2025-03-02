@@ -4,54 +4,42 @@ defmodule RailwayTest do
 
   use Railway
 
-  defp my_func({:halt, reason}), do: "Halted for #{reason}"
-  defp my_func({first, 42}), do: first + 2
-  defp my_func(first), do: first + 1
-  defp my_func(first, second), do: first * second
+  defp halt_func(value), do: {:halt, "Halted with value: #{value}"}
 
-  test "regular function call" do
-    assert my_func(1) == 2
-    assert my_func(2, 3) == 6
-
-    assert_raise ArithmeticError, "bad argument in arithmetic expression", fn ->
-      my_func({:ok, 1})
-    end
+  test "simple values are treated as in a regular pipe" do
+    assert "Hello World" ~>> String.replace("World", "Elixir") == "Hello Elixir"
+    assert [1, 2, 3] ~>> List.to_tuple() ~>> elem(1) == 2
   end
 
-  test "regular piped call" do
-    assert 1 |> my_func() == 2
-    assert 2 |> my_func(3) == 6
-
-    assert_raise ArithmeticError, "bad argument in arithmetic expression", fn ->
-      {:ok, 1} |> my_func()
-    end
+  test "{:ok, value} tuple - only value will be piped" do
+    assert {:ok, {"2025", "01", "12"}}
+           ~>> Tuple.to_list()
+           ~>> Enum.join("-")
+           ~>> Date.from_iso8601()
+           ~>> Calendar.strftime("%d.%m.%Y") == "12.01.2025"
   end
 
-  test "railway piped call with plain value" do
-    assert 1 ~>> my_func() == 2
-    assert 2 ~>> my_func(3) == 6
+  test "{:atom, value} tuple will be returned without processing the right side" do
+    assert {2025, 0, 0}
+           ~>> Date.from_erl()
+           ~>> Date.from_iso8601()
+           ~>> Calendar.strftime("%d.%m.%Y") == {:error, :invalid_date}
+
+    assert ~s|{"root":invalid}|
+           ~>> JSON.decode()
+           ~>> Map.get("root") == {:error, {:invalid_byte, 8, 105}}
+
+    assert "Hello World"
+           ~>> String.upcase()
+           ~>> halt_func()
+           ~>> String.split(" ")
+           ~>> hd() == {:halt, "Halted with value: HELLO WORLD"}
   end
 
-  test "railway piped call with :ok tuple" do
-    assert {:ok, 1} ~>> my_func() == 2
-    assert {:ok, 2} ~>> my_func(3) == 6
-
-    assert {:ok, {23, 42}} ~>> my_func() == 25
-  end
-
-  test "railway piped call with different tuples" do
-    assert {:error, 2} ~>> my_func() == {:error, 2}
-    assert {:error, 2} ~>> my_func(4) == {:error, 2}
-
-    assert {:halt, 3} ~>> my_func() == {:halt, 3}
-    assert {:halt, 3} ~>> my_func(6) == {:halt, 3}
-  end
-
-  test "railway piped call with nested tuples" do
-    assert {:ok, {:halt, "some reason"}} ~>> my_func() == "Halted for some reason"
-
-    assert_raise ArithmeticError, "bad argument in arithmetic expression", fn ->
-      {:ok, {:ok, 1}} |> my_func()
-    end
+  test "capture works the same as it does with the regular pipe" do
+    assert ~s|[{"name": "Alice"},{"name": "Bob"}]|
+           ~>> JSON.decode()
+           ~>> Enum.map(&String.replace("My name is #NAME#", "#NAME#", &1["name"])) ==
+             ["My name is Alice", "My name is Bob"]
   end
 end
