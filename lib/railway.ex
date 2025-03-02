@@ -29,13 +29,16 @@ defmodule Railway do
       {:error, "some string"}
 
   """
+  def unwrap({:ok, value}, fun), do: fun.(value)
+  def unwrap({term, _} = value, _fun) when is_atom(term), do: value
+  def unwrap(value, fun), do: fun.(value)
+
   defmacro left ~>> right do
     quote do
-      case unquote(left) do
-        {:ok, value} -> value |> unquote(right)
-        {_, _} = tuple -> tuple
-        value -> value |> unquote(right)
-      end
+      Railway.unwrap(
+        unquote(left),
+        fn value -> unquote(Macro.pipe(quote(do: value), right, 0)) end
+      )
     end
   end
 end
