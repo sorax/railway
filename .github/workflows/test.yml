@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 env:
-  OTP_VERSION: "26"
-  ELIXIR_VERSION: "1.15"
+  OTP_VERSION: "27"
+  ELIXIR_VERSION: "1.18"
 
 jobs:
   build_test:
