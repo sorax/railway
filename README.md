@@ -5,7 +5,7 @@
 [![Tests](https://github.com/sorax/railway/actions/workflows/test.yml/badge.svg)](https://github.com/sorax/railway/actions/workflows/test.yml)
 [![Code Quality](https://github.com/sorax/railway/actions/workflows/quality.yml/badge.svg)](https://github.com/sorax/railway/actions/workflows/quality.yml)
 [![Hex.pm](https://img.shields.io/hexpm/v/railway.svg)](https://hex.pm/packages/railway)
-[![hexdocs.pm](https://img.shields.io/badge/docs-1.0.0-brightgreen.svg)](https://hexdocs.pm/railway/1.0.0/Railway.html)
+[![hexdocs.pm](https://img.shields.io/badge/docs-1.1.0-brightgreen.svg)](https://hexdocs.pm/railway/1.1.0/Railway.html)
 [![Hex.pm Downloads](https://img.shields.io/hexpm/dt/railway)](https://hex.pm/packages/railway)
 [![License](https://img.shields.io/hexpm/l/railway.svg)](https://github.com/sorax/railway/blob/min/LICENSE.md)
 
@@ -16,7 +16,7 @@ Simply add `railway` to your list of dependencies in your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:railway, "~> 1.0"}
+    {:railway, "~> 1.1"}
   ]
 end
 ```
